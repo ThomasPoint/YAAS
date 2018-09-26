@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
@@ -6,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 
 # Create your views here.
-from yaasapp.forms import UserForm, ProfileForm
+from yaasapp.forms import UserForm, ProfileForm, SignUpForm
 
 
 def index(request):
@@ -37,4 +38,28 @@ def update_profile(request):
         'profile_form': profile_form
     })
 
-# todo : create profile
+
+def create_profile(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.profile.birth_date = form.cleaned_data.get('birth_date')
+            user.save()
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=user.username, password=raw_password)
+            login(request, user)
+            messages.success(request,
+                _('Your profile was successfully created!'))
+            return redirect('home')
+        else:
+            messages.error(request,
+                _('Please correct the error below.'))
+    else:
+        form = SignUpForm()
+    return render(request, 'yaasapp/signup.html', {
+        'form': form
+    })
+
+
