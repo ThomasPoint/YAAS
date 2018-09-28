@@ -1,13 +1,17 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
+from rest_framework import viewsets
+from rest_framework.decorators import api_view
 
-# Create your views here.
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm
+from yaasapp.models import Profile
+from yaasapp.serializers import ProfileSerializer
 
 
 def index(request):
@@ -29,7 +33,8 @@ def update_profile(request):
             #return redirect('yaasapp:index')
             return redirect('home')
         else:
-            messages.error(request, _('Please correct the error below.'))
+            if not user_form.data['email']:
+                messages.error(request, _('The email field should not be empty.'))
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)
@@ -63,3 +68,23 @@ def create_profile(request):
     })
 
 
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'yaasapp/change_password.html', {
+        'form': form
+    })
+
+# ViewSets define the view behavior.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
