@@ -1,16 +1,18 @@
+from datetime import datetime, timedelta, timezone
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.db import transaction
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
-from yaasapp.forms import UserForm, ProfileForm, SignUpForm
-from yaasapp.models import Profile
+from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm
+from yaasapp.models import Profile, Auction
 from yaasapp.serializers import ProfileSerializer
 
 
@@ -67,22 +69,48 @@ def create_profile(request):
         'form': form
     })
 
-
+@login_required
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
+            messages.success(request, _('Your password was successfully updated!'))
             return redirect('home')
         else:
-            messages.error(request, 'Please correct the error below.')
+            messages.error(request, _('Please correct the error below.'))
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'yaasapp/change_password.html', {
         'form': form
     })
+
+@login_required
+def create_auction(request):
+    if request.method == 'POST':
+        auction_form = AuctionForm(request.POST)
+        if auction_form.is_valid():
+            auction = auction_form.save(commit=False)
+            auction.seller = request.user
+            auction_form.save()
+            messages.success(request,
+                             'Your auction was successfully created!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below : ')
+            '''
+            if auction_form.data['deadline'] < (datetime.now(timezone.utc) + \
+                    timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S'):
+                    messages.error(request, _('The deadline should be 3 days after the day you posted it'))
+            '''
+
+    else:
+        auction_form = AuctionForm()
+    return render(request, 'yaasapp/create_auction.html', {
+        'auction_form': auction_form
+    })
+
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):

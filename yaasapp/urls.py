@@ -16,6 +16,7 @@ urlpatterns = [
     path('profile_update', views.update_profile, name='profile_update'),
     path('profile_create', views.create_profile, name='profile_create'),
     path('change_password', views.change_password, name='change_password'),
+    path('create_auction', views.create_auction, name='create_auction'),
     url(r'^api/', include(router.urls)),
 ]
 

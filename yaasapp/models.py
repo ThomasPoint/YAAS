@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from datetime import datetime, timedelta, timezone
 from django.utils.translation import gettext as _
 
 # Create your models here.
@@ -28,4 +29,27 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwarg):
     instance.profile.save()
+
+
+class Auction(models.Model):
+    STATE = (
+        ('ACTIVE', 'active'),
+        ('BANNED', 'banned'),
+        ('DUE', 'due'),
+        ('DEFAULT', 'default'),
+    )
+    seller = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=60, blank=False)
+    description = models.TextField(max_length=500, blank=False)
+    min_price = models.FloatField(blank=False, default=1)
+    state = models.CharField(max_length=1, choices=STATE, default='DEFAULT')
+    deadline = models.DateField(default=datetime.now()+timedelta(days=3))
+
+    def clean(self):
+        if self.min_price < 1:
+            raise ValidationError(_('The minimum price should be at least 1'))
+        elif self.deadline < datetime.now(timezone.utc).date() + timedelta(days=3):
+            raise ValidationError(_('The deadline should be 3 days after the '
+                                    'day you posted it'))
+
 
