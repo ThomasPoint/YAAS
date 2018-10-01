@@ -31,3 +31,10 @@ class AuctionForm(forms.ModelForm):
     class Meta:
         model = Auction
         fields = ('title', 'description', 'min_price', 'deadline')
+
+
+class AuctionUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Auction
+        fields = ('description', )
+

@@ -11,7 +11,8 @@ from django.utils.translation import gettext as _
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
-from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm
+from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
+    AuctionUpdateForm
 from yaasapp.models import Profile, Auction
 from yaasapp.serializers import ProfileSerializer
 
@@ -93,6 +94,7 @@ def create_auction(request):
         if auction_form.is_valid():
             auction = auction_form.save(commit=False)
             auction.seller = request.user
+            auction.state = 'ACTIVE'
             auction_form.save()
             messages.success(request,
                              'Your auction was successfully created!')
@@ -108,6 +110,36 @@ def create_auction(request):
     else:
         auction_form = AuctionForm()
     return render(request, 'yaasapp/create_auction.html', {
+        'auction_form': auction_form
+    })
+
+@login_required
+def update_auction(request, auction_id):
+    auction = get_object_or_404(Auction, pk=auction_id)
+    if request.method == 'POST':
+        if auction.seller == request.user:
+            if auction.state == 'ACTIVE':
+                auction_form = AuctionUpdateForm(request.POST, instance=auction)
+                if auction_form.is_valid():
+                    auction_form.save()
+                    messages.success(request,
+                                     'Your auction was successfully updated!')
+                    return redirect('home')
+                else:
+                    messages.error(request, _('Please correct the error below.'))
+            else:
+                return redirect('auction_not_active')
+        else:
+            return redirect('not_allowed')
+    else:
+        if auction.seller == request.user:
+            if auction.state == 'ACTIVE':
+                auction_form = AuctionUpdateForm(instance=auction)
+            else:
+                return redirect('auction_not_active')
+        else:
+            return redirect('not_allowed')
+    return render(request, 'yaasapp/update_auction.html', {
         'auction_form': auction_form
     })
 
