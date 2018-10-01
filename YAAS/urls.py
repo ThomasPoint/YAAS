@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 
-
 urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('not_allowed', TemplateView.as_view(template_name='not_allowed.html'),
+         name='not_allowed'),
+    path('auction_not_active', TemplateView.as_view(template_name='auction_not_active.html'),
+         name='auction_not_active'),
     path('yaasapp/', include('django.contrib.auth.urls')),
     path('yaasapp/', include('yaasapp.urls')),
     url(r'^admin/', admin.site.urls),
