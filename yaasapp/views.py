@@ -1,13 +1,19 @@
 from datetime import datetime, timedelta, timezone
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.mail import send_mail
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views import generic
+from django.views.generic.list import ListView
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
@@ -98,6 +104,13 @@ def create_auction(request):
             auction_form.save()
             messages.success(request,
                              'Your auction was successfully created!')
+            send_mail(
+                'Auction creation',
+                'Your auction was successfully created!',
+                'yaasapp@yopmail.com',
+                [request.user.email],
+                fail_silently=False,
+            )
             return redirect('home')
         else:
             messages.error(request, 'Please correct the error below : ')
@@ -142,6 +155,87 @@ def update_auction(request, auction_id):
     return render(request, 'yaasapp/update_auction.html', {
         'auction_form': auction_form
     })
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(staff_member_required, name='dispatch')
+class AuctionManagementView(generic.ListView):
+    model = Auction
+    template_name = 'yaasapp/manager_interface.html'
+    context_object_name = 'active_auctions'
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        # return Question.objects.order_by('-pub_date')[:5]
+        return Auction.objects.filter(
+            #Q(state='ACTIVE') | Q(state='BANNED')
+            state='ACTIVE'
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super(AuctionManagementView, self).get_context_data(**kwargs)
+        context['banned_auctions'] = Auction.objects.filter(state='BANNED')
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AuctionManagementView, self).dispatch(*args, **kwargs)
+
+    @method_decorator(staff_member_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AuctionManagementView, self).dispatch(*args, **kwargs)
+
+
+@login_required
+@staff_member_required
+def ban_auction(request, auction_id):
+    auction = get_object_or_404(Auction, pk=auction_id)
+    auction.state = 'BANNED'
+    auction.save()
+    messages.success(request,
+                     'The auction has successfully be banned!')
+    return redirect('yaasapp:manage_auction')
+
+@login_required
+@staff_member_required
+def active_auction(request, auction_id):
+    auction = get_object_or_404(Auction, pk=auction_id)
+    auction.state = 'ACTIVE'
+    auction.save()
+    messages.success(request,
+                     'The auction has successfully be activated!')
+    return redirect('yaasapp:manage_auction')
+
+
+"""
+Allow registered / unregistered user to get access to the list of active auctions
+"""
+class ActiveAuctionsView(generic.ListView):
+    model = Auction
+    template_name = 'yaasapp/search_active_auctions.html'
+    context_object_name = 'active_auctions'
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        # return Question.objects.order_by('-pub_date')[:5]
+        return Auction.objects.filter(
+            state='ACTIVE'
+        )
+
+
+def search_auction_by_title(request):
+    if ('title' in request.GET) and request.GET['title'].strip():
+        title = request.GET['title']
+        auctions = Auction.objects.filter(title__contains=title, state='ACTIVE')
+        return render(request, 'yaasapp/search_auctions_by_title.html', {
+            'auctions': auctions
+        })
+    else:
+        return render(request, 'yaasapp/search_auctions_by_title.html', {
+            'auctions': None
+        })
+
+
 
 
 # ViewSets define the view behavior.
