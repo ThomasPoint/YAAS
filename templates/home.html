@@ -3,10 +3,15 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-      Hi {{ user.first_name }} !
+        Hi {{ user.first_name }} !
         <p><a href="{% url 'logout' %}">logout</a></p>
     {% else %}
       <p>You are not logged in</p>
       <a href="{% url 'login' %}">login</a>
     {% endif %}
+    <br>
+    <br>
+    <a href="{% url 'yaasapp:active_auction_list' %}">All active auctions</a>
+    <br>
+    <a href="{% url 'yaasapp:search_auction_by_title' %}">Search auction by title</a>
 {% endblock %}
