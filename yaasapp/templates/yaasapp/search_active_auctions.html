@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h2>Active auctions</h2>
+    <a href="{% url 'home' %}">Home</a>
+    <br>
+    {% if active_auctions %}
+        {% for auction in active_auctions %}
+            {% if auction.state == 'ACTIVE'%}
+                <h3>Title : {{ auction.title }}</h3>
+                <p>Description : {{ auction.description }}</p>
+                {% if auction.seller != user %}
+                    <a href="#">Bid on this auction</a>
+                {% else %}
+                    <p style="color: red">You cannot bid on this auction because you posted it !</p>
+                    <a href="{% url 'yaasapp:update_auction' auction.id%}">Update auction</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+    <p> There is no active auctions.</p>
+    {% endif %}
+</body>
+</html>
