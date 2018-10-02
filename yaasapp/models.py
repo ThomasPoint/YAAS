@@ -43,12 +43,13 @@ class Auction(models.Model):
     description = models.TextField(max_length=500, blank=False)
     min_price = models.FloatField(blank=False, default=1)
     state = models.CharField(max_length=1, choices=STATE, default='DEFAULT')
+    post_date = models.DateField(default=datetime.now())
     deadline = models.DateField(default=datetime.now()+timedelta(days=3))
 
     def clean(self):
         if self.min_price < 1:
             raise ValidationError(_('The minimum price should be at least 1'))
-        elif self.deadline < datetime.now(timezone.utc).date() + timedelta(days=3):
+        elif self.deadline < self.post_date.date() + timedelta(days=3):
             raise ValidationError(_('The deadline should be 3 days after the '
                                     'day you posted it'))
 
