@@ -49,7 +49,7 @@ class Auction(models.Model):
     def clean(self):
         if self.min_price < 1:
             raise ValidationError(_('The minimum price should be at least 1'))
-        elif self.deadline < self.post_date.date() + timedelta(days=3):
+        elif self.deadline < self.post_date + timedelta(days=3):
             raise ValidationError(_('The deadline should be 3 days after the '
                                     'day you posted it'))
 
