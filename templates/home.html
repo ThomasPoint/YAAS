@@ -9,7 +9,20 @@
       <p>You are not logged in</p>
       <a href="{% url 'login' %}">login</a>
     {% endif %}
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <br>
+    {% if user.is_authenticated %}
+    <br>
+    <a href="{% url 'yaasapp:create_auction' %}">Create auction</a>
+    {% endif %}
     <br>
     <a href="{% url 'yaasapp:active_auction_list' %}">All active auctions</a>
     <br>

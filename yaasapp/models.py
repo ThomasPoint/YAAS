@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from django.utils.translation import gettext as _
 
 # Create your models here.
@@ -43,8 +43,8 @@ class Auction(models.Model):
     description = models.TextField(max_length=500, blank=False)
     min_price = models.FloatField(blank=False, default=1)
     state = models.CharField(max_length=1, choices=STATE, default='DEFAULT')
-    post_date = models.DateField(default=datetime.now())
-    deadline = models.DateField(default=datetime.now()+timedelta(days=3))
+    post_date = models.DateField(default=date.today())
+    deadline = models.DateField(default=date.today()+timedelta(days=3))
 
     def clean(self):
         if self.min_price < 1:

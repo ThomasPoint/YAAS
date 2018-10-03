@@ -18,7 +18,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
-    AuctionUpdateForm
+    AuctionUpdateForm, ConfAuctionCreationForm
 from yaasapp.models import Profile, Auction
 from yaasapp.serializers import ProfileSerializer
 
@@ -98,6 +98,12 @@ def create_auction(request):
     if request.method == 'POST':
         auction_form = AuctionForm(request.POST)
         if auction_form.is_valid():
+            form = ConfAuctionCreationForm({'title': auction_form.cleaned_data.get('title'),
+                                           'description': auction_form.cleaned_data.get('description'),
+                                           'min_price': auction_form.cleaned_data.get('min_price'),
+                                           'deadline': auction_form.cleaned_data.get('deadline')})
+
+            """
             auction = auction_form.save(commit=False)
             auction.seller = request.user
             auction.state = 'ACTIVE'
@@ -111,7 +117,9 @@ def create_auction(request):
                 [request.user.email],
                 fail_silently=False,
             )
-            return redirect('home')
+            """
+            #return redirect('home')
+            return render(request, 'yaasapp/conf_auction.html', {'form': form})
         else:
             messages.error(request, 'Please correct the error below : ')
             '''
@@ -125,6 +133,29 @@ def create_auction(request):
     return render(request, 'yaasapp/create_auction.html', {
         'auction_form': auction_form
     })
+
+@login_required
+def save_auction(request):
+    option = request.POST.get('option', 'No')
+    if option == 'Yes':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        min_price = request.POST.get('min_price')
+        deadline = request.POST.get('deadline')
+        auction = Auction(title=title,
+                          description=description,
+                          seller=request.user,
+                          min_price=min_price,
+                          deadline=deadline,
+                          state='ACTIVE')
+        auction.save()
+        messages.success(request,
+                         'Your auction was successfully created!')
+        return redirect('home')
+    else:
+        messages.success(request,
+                         'Your auction was not created!')
+        return redirect('home')
 
 @login_required
 def update_auction(request, auction_id):
