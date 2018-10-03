@@ -5,6 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core import mail
 from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
@@ -21,6 +22,7 @@ from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
     AuctionUpdateForm, ConfAuctionCreationForm
 from yaasapp.models import Profile, Auction
 from yaasapp.serializers import ProfileSerializer
+from yaasapp.utils import util_send_mail
 
 
 def index(request):
@@ -151,6 +153,7 @@ def save_auction(request):
         auction.save()
         messages.success(request,
                          'Your auction was successfully created!')
+        util_send_mail('Auction creation', 'Your auction has successfully been created!', request.user.email)
         return redirect('home')
     else:
         messages.success(request,
@@ -225,6 +228,7 @@ def ban_auction(request, auction_id):
     auction.save()
     messages.success(request,
                      'The auction has successfully be banned!')
+    util_send_mail('Banned auction', 'Your auction has been banned', auction.seller.email)
     return redirect('yaasapp:manage_auction')
 
 @login_required
