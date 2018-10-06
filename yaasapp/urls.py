@@ -27,6 +27,7 @@ urlpatterns = [
          name='active_auction_list'),
     path('search_auction_by_title', views.search_auction_by_title, name='search_auction_by_title'),
     path('save_auction', views.save_auction, name='save_auction'),
+    path('bid/<int:auction_id>', views.bid, name='bid'),
     url(r'^api/', include(router.urls)),
 ]
 

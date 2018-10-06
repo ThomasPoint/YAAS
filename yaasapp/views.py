@@ -1,3 +1,4 @@
+from _decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
 from django.contrib import messages
@@ -19,8 +20,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
-    AuctionUpdateForm, ConfAuctionCreationForm
-from yaasapp.models import Profile, Auction
+    AuctionUpdateForm, ConfAuctionCreationForm, BidForm
+from yaasapp.models import Profile, Auction, Bid
 from yaasapp.serializers import ProfileSerializer
 from yaasapp.utils import util_send_mail
 
@@ -271,6 +272,63 @@ def search_auction_by_title(request):
         })
 
 
+@login_required
+def bid(request, auction_id):
+    auction = get_object_or_404(Auction, pk=auction_id)
+    if auction.state == 'ACTIVE':
+        if request.method == 'POST':
+            bid_form = BidForm(request.POST)
+            if bid_form.is_valid():
+                # owner of auction can't bid on it
+                if auction.seller != request.user:
+                    bids = Bid.objects.filter(auction=auction).order_by('-value')
+                    if not bids:
+                        curr_win_bidder = ""
+                    else:
+                        curr_win_bidder = bids[0].bidder
+                    # user who currently win the auction cannot bid
+                    if curr_win_bidder == "" or request.user != curr_win_bidder:
+                        value = bid_form.cleaned_data.get('value')
+
+                        if not bids:
+                            max_val = auction.min_price
+                        else:
+                            max_val = bids[0].value
+                        # check that the new value is strictly greater than the previous one
+                        if value > max_val:
+                            bid = Bid(bidder=request.user, auction=auction,
+                                      value=value)
+                            util_send_mail('New bid', 'A new bid has been created for your auction', auction.seller)
+                            util_send_mail('New bid', 'Your are not anymore the leader of the auction ! Bid again to be the winner !', curr_win_bidder.email)
+                            bid.save()
+                            messages.success(request,
+                                           'You bid has been taken into account !')
+                            return redirect('home')
+                        else:
+                            messages.error(request,
+                                             f"The value of the bid should be greater than {max_val}")
+                    else:
+                        messages.error(request,
+                                         'You cannot bid since you are winning this auction !')
+                        return redirect('home')
+                else:
+                    messages.error(request,
+                                     'You cannot bid because you are the owner of the auction !')
+            else:
+                messages.success(request,
+                                 'Check the value you have entered !')
+        else:
+            bids = Bid.objects.filter(auction=auction).order_by('-value')
+            if not bids :
+                init_val = auction.min_price
+            else :
+               init_val = bids[0].value + Decimal('0.01')
+            bid_form = BidForm(initial={'value': init_val})
+        return render(request, 'yaasapp/bid.html', {
+            'form': bid_form,
+            'description': auction.description})
+    else:
+        return redirect('auction_not_active')
 
 
 # ViewSets define the view behavior.

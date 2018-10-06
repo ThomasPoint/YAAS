@@ -14,7 +14,7 @@
                 <h3>Title : {{ auction.title }}</h3>
                 <p>Description : {{ auction.description }}</p>
                 {% if auction.seller != user %}
-                    <a href="#">Bid on this auction</a>
+                    <a href="{% url 'yaasapp:bid' auction.id %}">Bid on this auction</a>
                 {% else %}
                     <p style="color: red">You cannot bid on this auction because you posted it !</p>
                     <a href="{% url 'yaasapp:update_auction' auction.id%}">Update auction</a>

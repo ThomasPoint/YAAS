@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 
-from yaasapp.models import Profile, Auction
+from yaasapp.models import Profile, Auction, Bid
 
 
 class UserForm(forms.ModelForm):
@@ -47,4 +47,10 @@ class ConfAuctionCreationForm(forms.Form):
     description = forms.CharField(widget=forms.HiddenInput())
     min_price = forms.FloatField(widget=forms.HiddenInput())
     deadline = forms.DateField(widget=forms.HiddenInput())
+
+
+class BidForm(forms.ModelForm):
+    class Meta:
+        model = Bid
+        fields = ('value',)
 

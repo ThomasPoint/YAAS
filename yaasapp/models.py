@@ -54,3 +54,8 @@ class Auction(models.Model):
                                     'day you posted it'))
 
 
+class Bid(models.Model):
+    bidder = models.ForeignKey(User, on_delete=models.CASCADE)
+    auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
+    date = models.DateTimeField(blank=False, default=datetime.now())
+    value = models.DecimalField(blank=False, decimal_places=2, max_digits=1000)
