@@ -23,7 +23,7 @@ from rest_framework.decorators import api_view
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
     AuctionUpdateForm, ConfAuctionCreationForm, BidForm
 from yaasapp.models import Profile, Auction, Bid
-from yaasapp.serializers import ProfileSerializer
+from yaasapp.serializers import ProfileSerializer, AuctionSerializer
 from yaasapp.utils import util_send_mail
 
 
@@ -344,12 +344,6 @@ def bid(request, auction_id):
         return redirect('auction_not_active')
 
 
-# ViewSets define the view behavior.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-
-
 def resolve_auction(request):
     auctions = Auction.objects.filter(state='ACTIVE')
     # we change the state of the auctions
@@ -394,3 +388,22 @@ def resolve_auction(request):
                                        f'You have not won this auction : {auction.title}',
                                        user_mail)
     return redirect('home')
+
+# ViewSets define the view behavior.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+
+class AuctionViewSet(viewsets.ModelViewSet):
+    queryset = Auction.objects.all()
+    serializer_class = AuctionSerializer
+
+    # override get_queryset to handle a search by title
+    def get_queryset(self):
+        title = self.request.query_params.get('title')
+        if not title:
+            queryset = Auction.objects.all()
+        else:
+            queryset = Auction.objects.filter(title__contains=title)
+        return queryset

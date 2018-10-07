@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.urls import path, include
 from rest_framework import routers
-from yaasapp.views import UserViewSet
+from yaasapp.views import UserViewSet, AuctionViewSet
 from . import views
 
 app_name ='yaasapp'
@@ -10,6 +10,7 @@ app_name ='yaasapp'
 # this is for the API
 router = routers.DefaultRouter()
 router.register('users', UserViewSet)
+router.register('auctions', AuctionViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
