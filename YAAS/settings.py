@@ -134,3 +134,5 @@ REST_FRAMEWORK = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = 'tmp/email' # change this to a proper location
+
+CELERY_BROKER_URL = "amqp://localhost"

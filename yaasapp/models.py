@@ -36,7 +36,9 @@ class Auction(models.Model):
         ('ACTIVE', 'active'),
         ('BANNED', 'banned'),
         ('DUE', 'due'),
-        ('DEFAULT', 'default'),
+        ('ADJUCATED', 'adjudicated'),
+        ('DEFAULT', 'default')
+        ,
     )
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=60, blank=False)
