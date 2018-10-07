@@ -1,11 +1,12 @@
 from _decimal import Decimal
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.models import User
 from django.core import mail
 from django.core.mail import send_mail
 from django.db import transaction
@@ -299,7 +300,8 @@ def bid(request, auction_id):
                             bid = Bid(bidder=request.user, auction=auction,
                                       value=value)
                             util_send_mail('New bid', 'A new bid has been created for your auction', auction.seller)
-                            util_send_mail('New bid', 'Your are not anymore the leader of the auction ! Bid again to be the winner !', curr_win_bidder.email)
+                            if curr_win_bidder != "":
+                                util_send_mail('New bid', 'Your are not anymore the leader of the auction ! Bid again to be the winner !', curr_win_bidder.email)
                             bid.save()
                             messages.success(request,
                                            'You bid has been taken into account !')
@@ -320,7 +322,7 @@ def bid(request, auction_id):
         else:
             bids = Bid.objects.filter(auction=auction).order_by('-value')
             if not bids :
-                init_val = auction.min_price
+                init_val = auction.min_price + 0.01
             else :
                init_val = bids[0].value + Decimal('0.01')
             bid_form = BidForm(initial={'value': init_val})
@@ -335,3 +337,52 @@ def bid(request, auction_id):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
+"""
+test for resolve function
+
+def resolve_auction(request):
+    auctions = Auction.objects.filter(state='ACTIVE')
+    # we change the state of the auctions
+    for auction in auctions:
+        date_today = date.today()
+        if auction.deadline < date_today + timedelta(days=4): # à changer par <
+            auction.state = 'DUE'
+            auction.save()
+
+            # we want to resolve the auction
+            # we order it by decreasing value
+
+            if not Bid.objects.filter(auction=auction).order_by('-value'):
+                winner = auction.seller
+            else:
+                winner = Bid.objects.filter(auction=auction).order_by('-value')[0].bidder
+
+            auction.state = 'ADJUCATED'
+            auction.save()
+
+            # send notification mail
+            util_send_mail('Auction resolved',
+                           'Your auction has been resolved'
+                               'and a winner has been chosen',
+                           auction.seller.email)
+            if winner != auction.seller:
+                util_send_mail('Auction win',
+                               f'You have won the auction : {auction.title}',
+                               winner.email)
+            else:
+                util_send_mail('Auction Finished',
+                               f'No one has bidden for your auction : {auction.title}',
+                               winner.email)
+            if not Bid.objects.filter(auction=auction)[1:]:
+                pass
+            else:
+                bidders_id = Bid.objects.filter(auction=auction).values_list('bidder', flat=True).distinct()
+                for bidder_id_value in bidders_id:
+                    if bidder_id_value != winner.id:
+                        user_mail = User.objects.get(pk=bidder_id_value).email
+                        util_send_mail('Auction lost',
+                                       f'You have not won this auction : {auction.title}',
+                                       user_mail)
+    return redirect('home')
+"""
