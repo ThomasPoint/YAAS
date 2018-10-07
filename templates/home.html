@@ -1,5 +1,6 @@
 <!-- templates/home.html -->
 {% extends './base.html' %}
+{% load i18n %}
 
 {% block content %}
     {% if user.is_authenticated %}
@@ -21,10 +22,10 @@
     <br>
     {% if user.is_authenticated %}
     <br>
-    <a href="{% url 'yaasapp:create_auction' %}">Create auction</a>
+    <a href="{% url 'yaasapp:create_auction' %}">{% trans "Create auction" %}</a>
     {% endif %}
     <br>
-    <a href="{% url 'yaasapp:active_auction_list' %}">All active auctions</a>
+    <a href="{% url 'yaasapp:active_auction_list' %}">{% trans "All active auctions" %}</a>
     <br>
-    <a href="{% url 'yaasapp:search_auction_by_title' %}">Search auction by title</a>
+    <a href="{% url 'yaasapp:search_auction_by_title' %}">{% trans "Search auctions by title" %}</a>
 {% endblock %}
