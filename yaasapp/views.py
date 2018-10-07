@@ -231,6 +231,17 @@ def ban_auction(request, auction_id):
     messages.success(request,
                      'The auction has successfully be banned!')
     util_send_mail('Banned auction', 'Your auction has been banned', auction.seller.email)
+
+    # send mail to the bidders
+    bidders_id = Bid.objects.filter(auction=auction).values_list('bidder',
+                                     flat=True).distinct()
+    for bidder_id_value in bidders_id:
+        if bidder_id_value != auction.seller.id:
+            user_mail = User.objects.get(pk=bidder_id_value).email
+            util_send_mail('Banned auction',
+                           f'The auction {auction.title} has been banned, you can\'t bid anymore',
+                           user_mail)
+    ####
     return redirect('yaasapp:manage_auction')
 
 @login_required
@@ -338,8 +349,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-"""
-test for resolve function
 
 def resolve_auction(request):
     auctions = Auction.objects.filter(state='ACTIVE')
@@ -385,4 +394,3 @@ def resolve_auction(request):
                                        f'You have not won this auction : {auction.title}',
                                        user_mail)
     return redirect('home')
-"""
