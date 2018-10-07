@@ -1,0 +1,75 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-07 14:42+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: YAAS/settings.py:47
+msgid "English"
+msgstr ""
+
+#: YAAS/settings.py:48
+msgid "French"
+msgstr ""
+
+#: templates/base.html:12
+msgid "YAAS ! Yet An other Auction Service"
+msgstr "YAAS ! Un autre service d'enchères !"
+
+#: templates/home.html:24
+msgid "Create auction"
+msgstr "Créer une enchère"
+
+#: templates/home.html:27
+msgid "All active auctions"
+msgstr "Liste des auctions actives"
+
+#: templates/home.html:29
+msgid "Search auctions by title"
+msgstr "Rechercher des auctions par titre"
+
+#: yaasapp/models.py:20
+msgid "The email should not be empty"
+msgstr ""
+
+#: yaasapp/models.py:53
+msgid "The minimum price should be at least 1"
+msgstr ""
+
+#: yaasapp/models.py:55
+msgid "The deadline should be 3 days after the day you posted it"
+msgstr ""
+
+#: yaasapp/views.py:46
+msgid "Your profile was successfully updated!"
+msgstr ""
+
+#: yaasapp/views.py:51
+msgid "The email field should not be empty."
+msgstr ""
+
+#: yaasapp/views.py:73
+msgid "Your profile was successfully created!"
+msgstr ""
+
+#: yaasapp/views.py:77 yaasapp/views.py:94 yaasapp/views.py:179
+msgid "Please correct the error below."
+msgstr ""
+
+#: yaasapp/views.py:91
+msgid "Your password was successfully updated!"
+msgstr ""
