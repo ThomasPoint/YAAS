@@ -19,6 +19,8 @@ from django.views import generic
 from django.views.generic.list import ListView
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
     AuctionUpdateForm, ConfAuctionCreationForm, BidForm
@@ -398,12 +400,21 @@ class UserViewSet(viewsets.ModelViewSet):
 class AuctionViewSet(viewsets.ModelViewSet):
     queryset = Auction.objects.all()
     serializer_class = AuctionSerializer
+    permission_classes = (AllowAny,)
 
     # override get_queryset to handle a search by title
     def get_queryset(self):
         title = self.request.query_params.get('title')
-        if not title:
-            queryset = Auction.objects.all()
+        id_val = self.request.query_params.get('id')
+
+        if not id_val:
+            if not title:
+                queryset = Auction.objects.all()
+            else:
+                queryset = Auction.objects.filter(title__contains=title)
         else:
-            queryset = Auction.objects.filter(title__contains=title)
+            auctions = set()
+            auction = get_object_or_404(Auction, pk=id_val)
+            auctions.add(auction)
+            queryset = auctions
         return queryset

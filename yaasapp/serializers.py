@@ -25,5 +25,5 @@ class AuctionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Auction
-        fields = ('seller', 'title', 'description', 'min_price', 'post_date',
+        fields = ('pk', 'seller', 'title', 'description', 'min_price', 'post_date',
                   'deadline', 'state')
