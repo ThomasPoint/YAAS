@@ -330,6 +330,8 @@ def bid(request, auction_id):
                             if curr_win_bidder != "":
                                 util_send_mail('New bid', 'Your are not anymore the leader of the auction ! Bid again to be the winner !', curr_win_bidder.email)
                             bid.save()
+                            auction.min_price = value
+                            auction.save()
                             messages.success(request,
                                            'You bid has been taken into account !')
                             return redirect('home')
