@@ -20,6 +20,10 @@
     {% endif %}
 
     <br>
+    {% if user.is_superuser %}
+        <br>
+        <a href="{% url 'yaasapp:manage_auction' %}">{% trans "Manage auctions" %}</a>
+    {% endif %}
     {% if user.is_authenticated %}
     <br>
     <a href="{% url 'yaasapp:create_auction' %}">{% trans "Create auction" %}</a>

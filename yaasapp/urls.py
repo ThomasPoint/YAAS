@@ -30,6 +30,7 @@ urlpatterns = [
     path('save_auction', views.save_auction, name='save_auction'),
     path('bid/<int:auction_id>', views.bid, name='bid'),
     path('resolve_auction', views.resolve_auction, name='resolve_auction'),
+    path('update_auction_seller/<int:auction_id>', views.update_auction_without_login, name='update_auction_seller'),
     url(r'^api/', include(router.urls)),
 ]
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-07 15:06+0000\n"
+"POT-Creation-Date: 2018-10-10 10:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,14 +43,18 @@ msgid "login"
 msgstr "login"
 
 #: templates/home.html:25
+msgid "Manage auctions"
+msgstr "Gestion des auctions"
+
+#: templates/home.html:29
 msgid "Create auction"
 msgstr "Créer une enchère"
 
-#: templates/home.html:28
+#: templates/home.html:32
 msgid "All active auctions"
 msgstr "Liste des auctions actives"
 
-#: templates/home.html:30
+#: templates/home.html:34
 msgid "Search auctions by title"
 msgstr "Rechercher des auctions par titre"
 
@@ -66,22 +70,22 @@ msgstr ""
 msgid "The deadline should be 3 days after the day you posted it"
 msgstr ""
 
-#: yaasapp/views.py:45
+#: yaasapp/views.py:47
 msgid "Your profile was successfully updated!"
 msgstr ""
 
-#: yaasapp/views.py:50
+#: yaasapp/views.py:52
 msgid "The email field should not be empty."
 msgstr ""
 
-#: yaasapp/views.py:72
+#: yaasapp/views.py:74
 msgid "Your profile was successfully created!"
 msgstr ""
 
-#: yaasapp/views.py:76 yaasapp/views.py:93 yaasapp/views.py:178
+#: yaasapp/views.py:78 yaasapp/views.py:95 yaasapp/views.py:180
 msgid "Please correct the error below."
 msgstr ""
 
-#: yaasapp/views.py:90
+#: yaasapp/views.py:92
 msgid "Your password was successfully updated!"
 msgstr ""

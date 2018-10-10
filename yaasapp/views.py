@@ -157,7 +157,8 @@ def save_auction(request):
         auction.save()
         messages.success(request,
                          'Your auction was successfully created!')
-        util_send_mail('Auction creation', 'Your auction has successfully been created!', request.user.email)
+        domain = request.META['HTTP_HOST']
+        util_send_mail('Auction creation', f'Your auction has successfully been created! {domain}/yaasapp/update_auction_seller/{auction.id}', request.user.email)
         return redirect('home')
     else:
         messages.success(request,
@@ -166,6 +167,36 @@ def save_auction(request):
 
 @login_required
 def update_auction(request, auction_id):
+    auction = get_object_or_404(Auction, pk=auction_id)
+    if request.method == 'POST':
+        if auction.seller == request.user:
+            if auction.state == 'ACTIVE':
+                auction_form = AuctionUpdateForm(request.POST, instance=auction)
+                if auction_form.is_valid():
+                    auction_form.save()
+                    messages.success(request,
+                                     'Your auction was successfully updated!')
+                    return redirect('home')
+                else:
+                    messages.error(request, _('Please correct the error below.'))
+            else:
+                return redirect('auction_not_active')
+        else:
+            return redirect('not_allowed')
+    else:
+        if auction.seller == request.user:
+            if auction.state == 'ACTIVE':
+                auction_form = AuctionUpdateForm(instance=auction)
+            else:
+                return redirect('auction_not_active')
+        else:
+            return redirect('not_allowed')
+    return render(request, 'yaasapp/update_auction.html', {
+        'auction_form': auction_form
+    })
+
+
+def update_auction_without_login(request, auction_id):
     auction = get_object_or_404(Auction, pk=auction_id)
     if request.method == 'POST':
         if auction.seller == request.user:
@@ -402,7 +433,7 @@ class AuctionViewSet(viewsets.ModelViewSet):
     serializer_class = AuctionSerializer
     permission_classes = (AllowAny,)
 
-    # override get_queryset to handle a search by title
+    # override get_queryset to handle a search by title and id
     def get_queryset(self):
         title = self.request.query_params.get('title')
         id_val = self.request.query_params.get('id')
