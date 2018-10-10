@@ -32,7 +32,8 @@ urlpatterns = [
     path('resolve_auction', views.resolve_auction, name='resolve_auction'),
     path('update_auction_seller/<int:auction_id>', views.update_auction_without_login, name='update_auction_seller'),
     url(r'^api/', include(router.urls)),
-    path('auction/<int:auction_id>', views.auction_by_id, name='auction_by_id'),
+    path('api/auction/<int:auction_id>', views.auction_by_id, name='auction_by_id'),
+    path('generatedata', views.generatedata, name='generate_data'),
 ]
 
 

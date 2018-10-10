@@ -6,6 +6,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.mail import send_mail
@@ -299,7 +300,7 @@ def search_auction_by_title(request):
         })
 
 
-@login_required
+@login_required(login_url="/yaasapp/login")
 def bid(request, auction_id):
     auction = get_object_or_404(Auction, pk=auction_id)
     if auction.state == 'ACTIVE':
@@ -431,4 +432,57 @@ def auction_by_id(request, pk):
     auction = get_object_or_404(Auction, id=pk)
     serializer = AuctionSerializer(auction)
     return Response(serializer.data)
+
+
+def generatedata(request):
+    User.objects.all().delete()
+    Profile.objects.all().delete()
+    Auction.objects.all().delete()
+
+    super_user = User.objects.create_superuser('admin', 'admin@example.com', 'admin2018')
+    super_user.save()
+
+    for i in range(50):
+        password = make_password(f'F[.87Yg*{i}')
+        user = User(username=f'tpoint{i}', email=f'tpoint{i}@yopmail.com',
+                      password=password, first_name=f'Thomas{i}',
+                      last_name=f'Point{i}')
+        user.save()
+
+    users = User.objects.all()[1:]
+    i = 0
+    for user in users:
+        user.profile.bio = f'Je m\'appelle Thomas{i}'
+        user.profile.birth_date = '2018-05-28'
+        user.profile.location = 'Sorgues'
+        user.save()
+        i = i+1
+
+    seller = User.objects.get(username='tpoint0')
+    for i in range(50):
+        auction = Auction(seller=seller, title=f'Auction {i}', description=f'I sell {i} items', min_price=i+1, state='ACTIVE')
+        auction.save()
+
+    bid1 = Bid(bidder=User.objects.all()[1], auction=Auction.objects.all()[1], value=7.0)
+    bid1.save()
+    auction = Auction.objects.all()[1]
+    auction.min_price = 7.0
+    auction.save()
+    bid2 = Bid(bidder=User.objects.all()[2], auction=Auction.objects.all()[1], value=45)
+    bid2.save()
+    auction = Auction.objects.all()[1]
+    auction.min_price = 45
+    auction.save()
+    bid3 = Bid(bidder=User.objects.all()[4], auction=Auction.objects.all()[5], value=45)
+    bid3.save()
+    auction = Auction.objects.all()[5]
+    auction.min_price = 45
+    auction.save()
+    bid4 = Bid(bidder=User.objects.all()[7], auction=Auction.objects.all()[6], value=63)
+    bid4.save()
+    auction = Auction.objects.all()[6]
+    auction.min_price = 63
+    auction.save()
+
+    return redirect('home')
 
