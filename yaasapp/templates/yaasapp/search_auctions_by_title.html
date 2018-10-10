@@ -18,8 +18,10 @@
 {% if auctions %}
     <h3>Results</h3>
 {% for auction in auctions %}
+    <hr>
     <h3>Title : {{ auction.title }}</h3>
     <p>Description : {{ auction.description }}</p>
+    <p>Current price : {{ auction.min_price }}</p>
     {% if auction.seller != user %}
         <a href="#">Bid on this auction</a>
     {% else %}

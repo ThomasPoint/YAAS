@@ -18,8 +18,9 @@ from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.generic.list import ListView
 from rest_framework import viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.permissions import AllowAny
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
@@ -198,29 +199,10 @@ def update_auction(request, auction_id):
 
 def update_auction_without_login(request, auction_id):
     auction = get_object_or_404(Auction, pk=auction_id)
-    if request.method == 'POST':
-        if auction.seller == request.user:
-            if auction.state == 'ACTIVE':
-                auction_form = AuctionUpdateForm(request.POST, instance=auction)
-                if auction_form.is_valid():
-                    auction_form.save()
-                    messages.success(request,
-                                     'Your auction was successfully updated!')
-                    return redirect('home')
-                else:
-                    messages.error(request, _('Please correct the error below.'))
-            else:
-                return redirect('auction_not_active')
-        else:
-            return redirect('not_allowed')
+    if auction.state == 'ACTIVE':
+        auction_form = AuctionUpdateForm(instance=auction)
     else:
-        if auction.seller == request.user:
-            if auction.state == 'ACTIVE':
-                auction_form = AuctionUpdateForm(instance=auction)
-            else:
-                return redirect('auction_not_active')
-        else:
-            return redirect('not_allowed')
+        return redirect('auction_not_active')
     return render(request, 'yaasapp/update_auction.html', {
         'auction_form': auction_form
     })
@@ -436,16 +418,17 @@ class AuctionViewSet(viewsets.ModelViewSet):
     # override get_queryset to handle a search by title and id
     def get_queryset(self):
         title = self.request.query_params.get('title')
-        id_val = self.request.query_params.get('id')
-
-        if not id_val:
-            if not title:
-                queryset = Auction.objects.all()
-            else:
-                queryset = Auction.objects.filter(title__contains=title)
+        if not title:
+            queryset = Auction.objects.all()
         else:
-            auctions = set()
-            auction = get_object_or_404(Auction, pk=id_val)
-            auctions.add(auction)
-            queryset = auctions
+            queryset = Auction.objects.filter(title__contains=title)
+
         return queryset
+
+@api_view(['GET'])
+@renderer_classes([JSONRenderer,])
+def auction_by_id(request, pk):
+    auction = get_object_or_404(Auction, id=pk)
+    serializer = AuctionSerializer(auction)
+    return Response(serializer.data)
+
