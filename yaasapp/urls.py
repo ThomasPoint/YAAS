@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     path('api/auction/<int:auction_id>', views.auction_by_id, name='auction_by_id'),
     path('generatedata', views.generatedata, name='generate_data'),
+    path('language/<slug:lang_code>', views.change_language, name='language'),
 ]
 
 

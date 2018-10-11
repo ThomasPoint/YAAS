@@ -14,8 +14,9 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import translation
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext as _
 from django.views import generic
 from django.views.generic.list import ListView
 from rest_framework import viewsets
@@ -486,5 +487,11 @@ def generatedata(request):
     auction.min_price = 63
     auction.save()
 
+    return redirect('home')
+
+
+def change_language(request, lang_code):
+    translation.activate(lang_code)
+    request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
     return redirect('home')
 
