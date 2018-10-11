@@ -9,14 +9,22 @@
 <body>
   <main>
     {% load i18n %}
-    <h1>{% trans "YAAS ! Yet An other Auction Service" %}</h1>
-    <!-- <form method="post" action=""%}">
-         <select name="lang_code">
-              <option value="fr">FR</option>
-              <option value="en">EN</option>
-         </select>
-        <button type="submit">Translate</button>
-    </form> -->
+  <hr>
+     <h1>{% trans "YAAS ! Yet An other Auction Service" %}</h1>
+      {% get_current_language as LANGUAGE_CODE %}
+      {% if LANGUAGE_CODE == 'en' %}
+          <form action="{% url "yaasapp:language" 'fr' %}" method="get">
+              <button type="submit">FR</button>
+          </form>
+      {% else %}
+          <form action="{% url "yaasapp:language" 'en' %}" method="get">
+            <button type="submit">EN</button>
+          </form>
+      {% endif %}
+  <br>
+  <hr>
+  <br>
+
     {% block content %}
     {% endblock %}
   </main>

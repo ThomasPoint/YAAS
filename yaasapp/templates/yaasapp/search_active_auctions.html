@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h2>Active auctions</h2>
-    <a href="{% url 'home' %}">Home</a>
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+    <h2>{% trans "Active auctions" %}</h2>
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
     <br>
     {% if active_auctions %}
         {% for auction in active_auctions %}
@@ -26,5 +22,4 @@
     {% else %}
     <p> There is no active auctions.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}

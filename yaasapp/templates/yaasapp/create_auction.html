@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load i18n %}
 
+{% block content %}
+    <h2>{% trans "Create a new auction" %}</h2>
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
     {% if messages %}
       <ul class="messages">
         {% for message in messages %}
@@ -34,5 +31,4 @@
         {% endfor %}
     <button type="submit">Create</button>
     </form>
-</body>
-</html>
+{% endblock %}

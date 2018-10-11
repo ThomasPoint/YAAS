@@ -4,7 +4,7 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        Hi {{ user.first_name }} !
+        {% trans "Welcome" %} {{ user.first_name }} !
         <p><a href="{% url 'logout' %}">{% trans "logout" %}</a></p>
     {% else %}
       <p>{% trans "You are not logged in" %}</p>
