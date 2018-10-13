@@ -20,15 +20,18 @@ from django.utils.translation import ugettext as _
 from django.views import generic
 from django.views.generic.list import ListView
 from rest_framework import viewsets
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.decorators import api_view, renderer_classes, \
+    authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
     AuctionUpdateForm, ConfAuctionCreationForm, BidForm
 from yaasapp.models import Profile, Auction, Bid
-from yaasapp.serializers import ProfileSerializer, AuctionSerializer
+from yaasapp.serializers import ProfileSerializer, AuctionSerializer, \
+    BidSerializer
 from yaasapp.utils import util_send_mail
 
 
@@ -361,6 +364,64 @@ def bid(request, auction_id):
             'description': auction.description})
     else:
         return redirect('auction_not_active')
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@renderer_classes([JSONRenderer,])
+def api_bid(request):
+    if request.query_params['auction_id'] != '' and request.query_params[
+        'auction_id'] is not None:
+        auction = get_object_or_404(Auction, id=request.query_params['auction_id'])
+    else:
+        return Response({'error' : 'Please enter a correct ID for the auction'})
+
+    if request.query_params['bid_price'] != '' and request.query_params['bid_price'] is not None:
+        bid_price = Decimal(request.query_params['bid_price'])
+    else:
+        return Response({'error': 'Please add a bid price'})
+
+    if auction.state == 'ACTIVE':
+        if auction.seller != request.user:
+            bids = Bid.objects.filter(auction=auction).order_by('-value')
+            if not bids:
+                curr_win_bidder = ""
+            else:
+                curr_win_bidder = bids[0].bidder
+            # user who currently win the auction cannot bid
+            if curr_win_bidder == "" or request.user != curr_win_bidder:
+                value = bid_price
+
+                if not bids:
+                    max_val = auction.min_price
+                else:
+                    max_val = bids[0].value
+                # check that the new value is strictly greater than the previous one
+                if value > max_val:
+                    bid = Bid(bidder=request.user, auction=auction,
+                              value=value)
+                    util_send_mail('New bid',
+                                   'A new bid has been created for your auction',
+                                   auction.seller)
+                    if curr_win_bidder != "":
+                        util_send_mail('New bid',
+                                       'Your are not anymore the leader of the auction ! Bid again to be the winner !',
+                                       curr_win_bidder.email)
+                    bid.save()
+                    auction.min_price = value
+                    auction.save()
+                    return Response(BidSerializer(bid).data)
+                else:
+                    return Response({
+                        'error': f"The value of the bid should be greater than {max_val}"})
+            else:
+                return Response({'error': 'You are the current winner of the auction, you cannot bid'})
+        else:
+            return Response({'error': 'You cannot bid because you are the owner of the auction !'})
+    else:
+        return Response({'error': 'The auction is not active anymore'})
+
+
 
 
 def resolve_auction(request):

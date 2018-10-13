@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from yaasapp.models import Profile, Auction
+from yaasapp.models import Profile, Auction, Bid
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,3 +27,10 @@ class AuctionSerializer(serializers.HyperlinkedModelSerializer):
         model = Auction
         fields = ('pk', 'seller', 'title', 'description', 'min_price', 'post_date',
                   'deadline', 'state')
+
+
+class BidSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Bid
+        fields = '__all__'
