@@ -374,7 +374,7 @@ def api_bid(request):
         'auction_id'] is not None:
         auction = get_object_or_404(Auction, id=request.query_params['auction_id'])
     else:
-        return Response({'error' : 'Please enter a correct ID for the auction'})
+        return Response({'error' : 'Please add a auction id'})
 
     if request.query_params['bid_price'] != '' and request.query_params['bid_price'] is not None:
         bid_price = Decimal(request.query_params['bid_price'])
@@ -548,6 +548,7 @@ def generatedata(request):
     auction.min_price = 63
     auction.save()
 
+    messages.success(request, _('Data have been successfully generated !'))
     return redirect('home')
 
 
