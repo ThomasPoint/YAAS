@@ -32,7 +32,7 @@ from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
 from yaasapp.models import Profile, Auction, Bid
 from yaasapp.serializers import ProfileSerializer, AuctionSerializer, \
     BidSerializer
-from yaasapp.utils import util_send_mail
+from yaasapp.utils import util_send_mail, util_currency_convert
 
 
 def index(request):
@@ -160,6 +160,7 @@ def save_auction(request):
                           min_price=min_price,
                           deadline=deadline,
                           state='ACTIVE')
+        auction.currency_value = float(auction.min_price)*float(util_currency_convert(auction.currency))
         auction.save()
         messages.success(request,
                          'Your auction was successfully created!')
@@ -294,6 +295,7 @@ class ActiveAuctionsView(generic.ListView):
 def search_auction_by_title(request):
     if ('title' in request.GET) and request.GET['title'].strip():
         title = request.GET['title']
+        request.session['search_title'] = title
         auctions = Auction.objects.filter(title__contains=title, state='ACTIVE')
         return render(request, 'yaasapp/search_auctions_by_title.html', {
             'auctions': auctions
@@ -335,6 +337,7 @@ def bid(request, auction_id):
                                 util_send_mail('New bid', 'Your are not anymore the leader of the auction ! Bid again to be the winner !', curr_win_bidder.email)
                             bid.save()
                             auction.min_price = value
+                            auction.currency_value = auction.min_price*Decimal(util_currency_convert(auction.currency))
                             auction.save()
                             messages.success(request,
                                            'You bid has been taken into account !')
@@ -409,6 +412,7 @@ def api_bid(request):
                                        curr_win_bidder.email)
                     bid.save()
                     auction.min_price = value
+                    auction.currency_value = auction.min_price * Decimal(util_currency_convert(auction.currency))
                     auction.save()
                     return Response(BidSerializer(bid).data)
                 else:
@@ -525,27 +529,36 @@ def generatedata(request):
     seller = User.objects.get(username='tpoint0')
     for i in range(50):
         auction = Auction(seller=seller, title=f'Auction {i}', description=f'I sell {i} items', min_price=i+1, state='ACTIVE')
+        auction.currency_value = util_currency_convert(auction.currency)*auction.min_price
         auction.save()
 
     bid1 = Bid(bidder=User.objects.all()[1], auction=Auction.objects.all()[1], value=7.0)
     bid1.save()
     auction = Auction.objects.all()[1]
     auction.min_price = 7.0
+    auction.currency_value = util_currency_convert(
+                                                   auction.currency) * auction.min_price
     auction.save()
     bid2 = Bid(bidder=User.objects.all()[2], auction=Auction.objects.all()[1], value=45)
     bid2.save()
     auction = Auction.objects.all()[1]
     auction.min_price = 45
+    auction.currency_value = util_currency_convert(
+                                                   auction.currency) * auction.min_price
     auction.save()
     bid3 = Bid(bidder=User.objects.all()[4], auction=Auction.objects.all()[5], value=45)
     bid3.save()
     auction = Auction.objects.all()[5]
     auction.min_price = 45
+    auction.currency_value = util_currency_convert(
+                                                   auction.currency) * auction.min_price
     auction.save()
     bid4 = Bid(bidder=User.objects.all()[7], auction=Auction.objects.all()[6], value=63)
     bid4.save()
     auction = Auction.objects.all()[6]
     auction.min_price = 63
+    auction.currency_value = util_currency_convert(
+                                                   auction.currency) * auction.min_price
     auction.save()
 
     messages.success(request, _('Data have been successfully generated !'))
@@ -556,4 +569,30 @@ def change_language(request, lang_code):
     translation.activate(lang_code)
     request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
     return redirect('home')
+
+def change_currency(request, auction_id):
+    auction = get_object_or_404(Auction, id=auction_id)
+    if request.GET['currency'] != '' and request.GET['currency'] is not None:
+        currency_dst = request.GET['currency']
+        auction.currency = currency_dst
+        auction.currency_value = auction.min_price*util_currency_convert(currency_dst)
+        auction.save()
+    else:
+        messages.error(request, _('Correct the value : expected USD, EUR, SEK'))
+
+    # we check if the received request if from the search auction by title page
+    if request.GET.get('is_search_by_title') is not None and request.GET.get('is_search_by_title') == 'True':
+        search_title = True
+    else:
+        search_title = False
+
+    if search_title and (request.session['search_title'] is not None or request.session['search_title'] != ''):
+        auctions = Auction.objects.filter(title__contains=request.session['search_title'],
+                                          state='ACTIVE')
+        return render(request, 'yaasapp/search_auctions_by_title.html', {
+            'auctions': auctions
+        })
+    else:
+        return redirect('yaasapp:active_auction_list')
+
 

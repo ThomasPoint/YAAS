@@ -7,7 +7,7 @@
 <br>
 <br>
 
-<form action="" method="get">
+<form action="{% url 'yaasapp:search_auction_by_title' %}" method="get">
     <input type="text" name="title" type="text"/>
     <button type="submit" >Search</button>
 </form>
@@ -18,7 +18,33 @@
     <hr>
     <h3>Title : {{ auction.title }}</h3>
     <p>Description : {{ auction.description }}</p>
-    <p>Current price : {{ auction.min_price }}</p>
+    <p>Current price (EUR): {{ auction.min_price }}</p>
+    <p>Current price ({{ auction.currency }}) : {{ auction.currency_value |floatformat:2}}</p>
+    <form action="{% url 'yaasapp:change_currency' auction.id %}">
+    {% csrf_token %}
+    <table>
+    <thead>
+    <th>
+      <input type="hidden" name="is_search_by_title" value="True">
+      <select name="currency">
+          {% if auction.currency == 'USD' %}
+            <option value="GBP">GBP</option>
+            <option value="SEK">SEK</option>
+          {% elif auction.currency == 'GBP' %}
+              <option value="USD">USD</option>
+              <option value="SEK">SEK</option>
+          {% else %}
+              <option value="USD">USD</option>
+              <option value="GBP">GBP</option>
+          {% endif %}
+      </select>
+    </th>
+    <th>
+      <input type="submit" value="Change currency">
+    </th>
+    </thead>
+    </table>
+    </form>
     {% if auction.seller != user %}
         <a href="#">Bid on this auction</a>
     {% else %}
