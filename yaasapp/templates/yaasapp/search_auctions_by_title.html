@@ -19,7 +19,7 @@
     <h3>Title : {{ auction.title }}</h3>
     <p>Description : {{ auction.description }}</p>
     <p>Current price (EUR): {{ auction.min_price }}</p>
-    <p>Current price ({{ auction.currency }}) : {{ auction.currency_value }}</p>
+    <p>Current price ({{ auction.currency }}) : {{ auction.currency_value |floatformat:2}}</p>
     <form action="{% url 'yaasapp:change_currency' auction.id %}">
     {% csrf_token %}
     <table>
