@@ -10,7 +10,32 @@
                 <hr>
                 <h3>Title : {{ auction.title }}</h3>
                 <p>Description : {{ auction.description }}</p>
-                <p>Current price : {{ auction.min_price }}</p>
+                <p>Current price (EUR): {{ auction.min_price }}</p>
+                <p>Current price ({{ auction.currency }}) : {{ auction.currency_value }}</p>
+                <form action="{% url 'yaasapp:change_currency' auction.id %}">
+                {% csrf_token %}
+                <table>
+                <thead>
+                <th>
+                  <select name="currency">
+                      {% if auction.currency == 'USD' %}
+                        <option value="GBP">GBP</option>
+                        <option value="SEK">SEK</option>
+                      {% elif auction.currency == 'GBP' %}
+                          <option value="USD">USD</option>
+                          <option value="SEK">SEK</option>
+                      {% else %}
+                          <option value="USD">USD</option>
+                          <option value="GBP">GBP</option>
+                      {% endif %}
+                  </select>
+                </th>
+                <th>
+                  <input type="submit" value="Change currency">
+                </th>
+                </thead>
+                </table>
+                </form>
                 {% if auction.seller != user %}
                     <a href="{% url 'yaasapp:bid' auction.id %}">Bid on this auction</a>
                 {% else %}

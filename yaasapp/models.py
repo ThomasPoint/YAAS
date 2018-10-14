@@ -40,6 +40,13 @@ class Auction(models.Model):
         ('DEFAULT', 'default')
         ,
     )
+
+    CURRENCY = (
+        ('USD', 'usd'),
+        ('SEK', 'sek'),
+        ('GBP', 'gbp'),
+
+    )
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=60, blank=False)
     description = models.TextField(max_length=500, blank=False)
@@ -47,6 +54,8 @@ class Auction(models.Model):
     state = models.CharField(max_length=1, choices=STATE, default='DEFAULT')
     post_date = models.DateField(default=date.today())
     deadline = models.DateField(default=date.today()+timedelta(days=3))
+    currency = models.CharField(max_length=1, choices=CURRENCY, default='USD')
+    currency_value = models.FloatField(blank=True, default=1)
 
     def clean(self):
         if self.min_price < 1:
