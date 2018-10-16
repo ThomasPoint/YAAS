@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h2>Bid on this auction</h2>
 
 {% if messages %}
       <div class="messages">
@@ -15,12 +13,11 @@
 {% endif %}
 
 <h3>Description :</h3>
-<textarea>{{ description }}</textarea>
+<textarea readonly>{{ description }}</textarea>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Send</button>
 </form>
 
-</body>
-</html>
+{% endblock %}

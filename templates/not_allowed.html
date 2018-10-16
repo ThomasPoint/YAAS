@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!-- templates/home.html -->
+{% extends './base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <br>
     <p>You are not allowed to access this ressource.</p>
-</body>
-</html>
+{% endblock %}

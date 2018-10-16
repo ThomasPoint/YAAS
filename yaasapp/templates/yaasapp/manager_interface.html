@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
     <H1>Management Interface</H1>
 
-    <h2>Active auctions</h2>
+    <h2 style="color: green">Active auctions</h2>
     {% if active_auctions %}
         {% for auction in active_auctions %}
             {% if auction.state == 'ACTIVE'%}
+                <hr>
                 <h3>Title : {{ auction.title }}</h3>
                 <p>Description : {{ auction.description }}</p>
                 <a href="{% url 'yaasapp:ban_auction' auction.id %}">Ban this auction</a>
@@ -21,7 +19,7 @@
     {% endif %}
 
     <br>
-    <h2>Banned auctions</h2>
+    <h2 style="color: red">Banned auctions</h2>
     {% if banned_auctions %}
         {% for auction in banned_auctions %}
             {% if auction.state == 'BANNED'%}
@@ -33,6 +31,4 @@
     {% else %}
         <p> There is no banned auctions.</p>
     {% endif %}
-
-</body>
-</html>
+{% endblock %}

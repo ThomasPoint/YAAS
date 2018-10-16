@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load i18n %}
 
+
+{% block content %}
+    <h2>Update auction</h2>
     {{auction_form.non_field_errors}}
 
     <form method="post">
@@ -25,6 +23,4 @@
         {% endfor %}
     <button type="submit">Update</button>
     </form>
-
-</body>
-</html>
+{% endblock %}

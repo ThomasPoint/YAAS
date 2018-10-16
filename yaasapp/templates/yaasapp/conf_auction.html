@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
     <form method="post" action="{% url 'yaasapp:save_auction' %}">
         {% csrf_token %}
         <h2>Are you sure you want to submit this auction ? </h2>
         {{ form.as_p }}
         <button type="submit">Send</button>
     </form>
-</body>
-</html>
+{% endblock %}
