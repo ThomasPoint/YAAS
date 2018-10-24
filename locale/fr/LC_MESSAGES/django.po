@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-13 12:16+0000\n"
+"POT-Creation-Date: 2018-10-24 10:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templates/auction_not_active.html:6 templates/base.html:25
+#: templates/not_allowed.html:6
+msgid "Home"
+msgstr "Accueil"
 
 #: templates/base.html:13
 msgid "YAAS ! Yet An other Auction Service"
@@ -42,15 +47,23 @@ msgstr "login"
 msgid "Manage auctions"
 msgstr "Gestion des auctions"
 
-#: templates/home.html:29
+#: templates/home.html:29 yaasapp/templates/yaasapp/email_history.html:5
+msgid "Email history"
+msgstr "Historique des emails"
+
+#: templates/home.html:33
+msgid "Change password"
+msgstr ""
+
+#: templates/home.html:37
 msgid "Create auction"
 msgstr "Créer une enchère"
 
-#: templates/home.html:32
+#: templates/home.html:40
 msgid "All active auctions"
 msgstr "Liste des auctions actives"
 
-#: templates/home.html:34
+#: templates/home.html:42
 msgid "Search auctions by title"
 msgstr "Rechercher des auctions par titre"
 
@@ -58,11 +71,11 @@ msgstr "Rechercher des auctions par titre"
 msgid "The email should not be empty"
 msgstr ""
 
-#: yaasapp/models.py:53
+#: yaasapp/models.py:62
 msgid "The minimum price should be at least 1"
 msgstr ""
 
-#: yaasapp/models.py:55
+#: yaasapp/models.py:64
 msgid "The deadline should be 3 days after the day you posted it"
 msgstr ""
 
@@ -70,35 +83,42 @@ msgstr ""
 msgid "Create a new auction"
 msgstr "Créer une enchère"
 
-#: yaasapp/templates/yaasapp/create_auction.html:6
-#: yaasapp/templates/yaasapp/search_active_auctions.html:5
-msgid "Home"
-msgstr "Accueil"
+#: yaasapp/templates/yaasapp/email_history.html:14
+msgid "There is no emails"
+msgstr "Il n'y a pas d'emails"
 
 #: yaasapp/templates/yaasapp/search_active_auctions.html:4
 msgid "Active auctions"
 msgstr "Liste des auctions actives"
 
-#: yaasapp/views.py:53
+#: yaasapp/views.py:55
 msgid "Your profile was successfully updated!"
 msgstr ""
 
-#: yaasapp/views.py:58
+#: yaasapp/views.py:60
 msgid "The email field should not be empty."
 msgstr ""
 
-#: yaasapp/views.py:80
+#: yaasapp/views.py:82
 msgid "Your profile was successfully created!"
 msgstr ""
 
-#: yaasapp/views.py:84 yaasapp/views.py:101 yaasapp/views.py:187
+#: yaasapp/views.py:86 yaasapp/views.py:103 yaasapp/views.py:190
 msgid "Please correct the error below."
 msgstr ""
 
-#: yaasapp/views.py:98
+#: yaasapp/views.py:100
 msgid "Your password was successfully updated!"
 msgstr ""
 
-#: yaasapp/views.py:551
+#: yaasapp/views.py:567
 msgid "Data have been successfully generated !"
 msgstr "Les données ont été correctement générées"
+
+#: yaasapp/views.py:584
+msgid "Correct the value : expected USD, EUR, SEK"
+msgstr ""
+
+#: yaasapp/views.py:613
+msgid "You must be admin."
+msgstr "Vous devez être administrateur."

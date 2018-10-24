@@ -24,6 +24,10 @@
         <br>
         <a href="{% url 'yaasapp:manage_auction' %}">{% trans "Manage auctions" %}</a>
     {% endif %}
+    {% if user.is_superuser %}
+        <br>
+        <a href="{% url 'yaasapp:email_history' %}">{% trans "Email history" %}</a>
+    {% endif %}
     {% if user.is_authenticated %}
     <br>
     <a href="{% url 'yaasapp:change_password' %}">{% trans "Change password" %}</a>

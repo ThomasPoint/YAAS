@@ -43,6 +43,23 @@
                 {% endif %}
             {% endif %}
         {% endfor %}
+{#        <br>#}
+{#        <br>#}
+{#        {% if is_paginated %}#}
+{#        <div class="pagination">#}
+{#            <span class="page-links">#}
+{#                {% if page_obj.has_previous %}#}
+{#                    <a href="/yaasapp/active_auction_list?page={{ page_obj.previous_page_number }}">{% trans "previous"%}</a>#}
+{#                {% endif %}#}
+{#                <span class="page-current">#}
+{#                    {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}#}
+{#                </span>#}
+{#                {% if page_obj.has_next %}#}
+{#                    <a href="/yaasapp/active_auction_list?page={{ page_obj.next_page_number }}">{% trans "next"%}</a>#}
+{#                {% endif %}#}
+{#            </span>#}
+{#        </div>#}
+{#    {% endif %}#}
     {% else %}
     <p> There is no active auctions.</p>
     {% endif %}

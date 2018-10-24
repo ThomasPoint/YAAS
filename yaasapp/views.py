@@ -1,3 +1,4 @@
+import os
 from _decimal import Decimal
 from datetime import datetime, timedelta, timezone, date
 
@@ -27,6 +28,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
+from YAAS.settings import EMAIL_FILE_PATH
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
     AuctionUpdateForm, ConfAuctionCreationForm, BidForm
 from yaasapp.models import Profile, Auction, Bid
@@ -283,6 +285,7 @@ class ActiveAuctionsView(generic.ListView):
     model = Auction
     template_name = 'yaasapp/search_active_auctions.html'
     context_object_name = 'active_auctions'
+    # paginate_by = 3
 
     def get_queryset(self):
         """Return the last five published questions."""
@@ -595,4 +598,17 @@ def change_currency(request, auction_id):
     else:
         return redirect('yaasapp:active_auction_list')
 
+@login_required
+def email_history(request):
+    if request.user.is_superuser:
+        directory = EMAIL_FILE_PATH
+        emails = []
 
+        for file in os.listdir(directory):
+            with open(os.path.join(directory, file), 'r') as email_file:
+                data = email_file.read()
+            emails.append(data)
+        return render(request, 'yaasapp/email_history.html', {"emails": emails})
+    else:
+        messages.warning(request, _("You must be admin."))
+        return redirect('home')

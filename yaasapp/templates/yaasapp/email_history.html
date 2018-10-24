@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h2>{% trans "Email history" %}</h2>
+    <hr>
+    <br>
+    {% if emails %}
+        {% for email in emails %}
+            <p>{{ email }}</p>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>{% trans "There is no emails" %}</p>
+    {% endif %}
+{% endblock %}

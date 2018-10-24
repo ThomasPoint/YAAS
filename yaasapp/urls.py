@@ -1,7 +1,8 @@
 from django.conf.urls import url
 from django.urls import path, include
 from rest_framework import routers
-from yaasapp.views import UserViewSet, AuctionViewSet, api_bid, change_currency
+from yaasapp.views import UserViewSet, AuctionViewSet, api_bid, \
+    change_currency, email_history
 from . import views
 
 app_name ='yaasapp'
@@ -37,6 +38,7 @@ urlpatterns = [
     path('generatedata', views.generatedata, name='generate_data'),
     path('language/<slug:lang_code>', views.change_language, name='language'),
     path('change_currency/<int:auction_id>', change_currency, name='change_currency'),
+    path('email_history', email_history, name='email_history'),
 ]
 
 
