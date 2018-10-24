@@ -208,7 +208,17 @@ def update_auction(request, auction_id):
 def update_auction_without_login(request, auction_id):
     auction = get_object_or_404(Auction, pk=auction_id)
     if auction.state == 'ACTIVE':
-        auction_form = AuctionUpdateForm(instance=auction)
+        if request.method =='POST':
+            auction_form = AuctionUpdateForm(request.POST, instance=auction)
+            if auction_form.is_valid():
+                auction_form.save()
+                messages.success(request,
+                                 'Your auction was successfully updated!')
+                return redirect('home')
+            else:
+                messages.error(request, _('Please correct the error below.'))
+        else:
+            auction_form = AuctionUpdateForm(instance=auction)
     else:
         return redirect('auction_not_active')
     return render(request, 'yaasapp/update_auction.html', {
