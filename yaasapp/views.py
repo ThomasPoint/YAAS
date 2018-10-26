@@ -29,6 +29,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from YAAS.settings import EMAIL_FILE_PATH
+from yaasapp import data
+from yaasapp.data import mydata
 from yaasapp.forms import UserForm, ProfileForm, SignUpForm, AuctionForm, \
     AuctionUpdateForm, ConfAuctionCreationForm, BidForm
 from yaasapp.models import Profile, Auction, Bid
@@ -540,10 +542,12 @@ def generatedata(request):
         i = i+1
 
     seller = User.objects.get(username='tpoint0')
-    for i in range(50):
-        auction = Auction(seller=seller, title=f'Auction {i}', description=f'I sell {i} items', min_price=i+1, state='ACTIVE')
+    i = 0
+    for key in mydata:
+        auction = Auction(seller=seller, title=key, description=mydata[key], min_price=i+1, state='ACTIVE')
         auction.currency_value = util_currency_convert(auction.currency)*auction.min_price
         auction.save()
+        i+1
 
     bid1 = Bid(bidder=User.objects.all()[1], auction=Auction.objects.all()[1], value=7.0)
     bid1.save()
