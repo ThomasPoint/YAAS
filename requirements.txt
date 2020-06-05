@@ -3,7 +3,7 @@ billiard==3.5.0.4
 celery==4.2.1
 certifi==2018.8.24
 chardet==3.0.4
-Django==2.1
+Django==2.2.13
 django-filter==2.0.0
 djangorestframework==3.8.2
 idna==2.7
